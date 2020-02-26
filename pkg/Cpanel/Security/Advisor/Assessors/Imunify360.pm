@@ -281,12 +281,15 @@ sub _suggest_imunify360 {
 sub _suggest_iav {
     my ($self) = @_;
 
-    if ( !$self->{iav}{installed} ) {
-        $self->_avplus_advice( advice  => 'error' );
-        $self->_avplus_advice( upgrade => 1, advice => 'warn' );
+    if ( !$self->{iav}{installed} && !$self->{iav}{licensed} ) {
+        $self->_avplus_advice( action => 'installav', advice => 'bad' );
+        $self->_avplus_advice( action => 'upgrade',   advice => 'warn' );
+    }
+    elsif ( !$self->{iav}{installed} && $self->{iav}{licensed} ) {
+        $self->_avplus_advice( action => 'installplus', advice => 'bad' );
     }
     elsif ( $self->{iav}{installed} && !$self->{iav}{licensed} ) {
-        $self->_avplus_advice( upgrade => 1, advice => 'warn' );
+        $self->_avplus_advice( action => 'upgrade', advice => 'warn' );
     }
     elsif ( $self->{iav}{installed} && $self->{iav}{licensed} ) {
         $self->add_good_advice(
@@ -309,46 +312,68 @@ sub _suggest_iav {
     return 1;
 }
 
-sub _bad_avplus {
-    my ( $self, %args ) = @_;
-    return $self->add_bad_advice(%args);
-
+sub _upgrade_avplus_text {
+    my ($self) = @_;
+    my $purchase_url = $self->base_path('scripts13/purchase_imunifyavplus_init_SECURITYADVISOR');
+    return {
+        text       => locale()->maketext("Upgrade to [asis,ImunifyAV+] to scan for malware and clean up infected files with one click."),
+        link       => locale()->maketext( "[output,url,_1,Get ImunifyAV+,_2,_3] for \$[_4]/month.", $purchase_url, 'target', '_blank', $self->{iav}{price} ),
+        suggestion => locale()->maketext("ImunifyAV+ brings you the advanced scanning of ImunifyAV and adds more options to make protecting servers from malicious code almost effortless. Enhanced features include:") . "<ul>" . "<li>"
+          . locale()->maketext("Malware and virus scanning") . "</li>" . "<li>"
+          . locale()->maketext("Email notifications if infected files are found") . "</li>" . "<li>"
+          . locale()->maketext("Automatically clean up infected files") . "</li>" . "<li>"
+          . locale()->maketext("Easy-to-use GUI makes monitoring simple") . "</li>" . "<li>"
+          . locale()->maketext( "[output,url,_1,Learn more about ImunifyAV+,_2,_3]", 'https://go.cpanel.net/buyimunifyAVplus', 'target', '_blank' ) . "</li>" . "</ul>",
+    };
 }
 
-sub _warn_avplus {
-    my ( $self, %args ) = @_;
-    return $self->add_warn_advice(%args);
+sub _install_av_text {
+    my ($self) = @_;
+    my $install_av_url = $self->base_path('scripts13/install_imunifyav_SECURITYADVISOR');
+    return {
+        text       => locale()->maketext("Install [asis,ImunifyAV] to scan your websites for malware."),
+        link       => locale()->maketext( "[output,url,_1,Install ImunifyAV,_2,_3] for free.", $install_av_url, 'target', '_blank' ),
+        suggestion => '',
+    };
+}
+
+sub _install_avplus_text {
+    my ($self) = @_;
+    my $install_plus_url = $self->base_path('scripts13/install_imunifyavplus_SECURITYADVISOR');
+    return {
+        text       => locale()->maketext("You have an [asis,ImunifyAV+] license, but you do not have [asis,ImunifyAV+] installed on your server."),
+        link       => locale()->maketext( "[output,url,_1,Install ImunifyAV+,_2,_3].", $install_plus_url, 'target', '_blank' ),
+        suggestion => '',
+    };
 }
 
 sub _avplus_advice {
     my ( $self, %args ) = @_;
 
-    my $purchase_url = $self->base_path('scripts13/purchase_imunifyavplus_init_SECURITYADVISOR');
-    my $upgrade_text = locale()->maketext("Upgrade to [asis,ImunifyAV+] to scan for malware and clean up infected files with one click.");
-    my $upgrade_link = locale()->maketext( "[output,url,_1,Get ImunifyAV+,_2,_3] for \$[_4]/month.", $purchase_url, 'target', '_blank', $self->{iav}{price} );
-    my $upgrade_sugg =
-        locale()->maketext("ImunifyAV+ brings you the advanced scanning of ImunifyAV and adds more options to make protecting servers from malicious code almost effortless. Enhanced features include:") . "<ul>" . "<li>"
-      . locale()->maketext("Malware and virus scanning") . "</li>" . "<li>"
-      . locale()->maketext("Email notifications if infected files are found") . "</li>" . "<li>"
-      . locale()->maketext("Automatically clean up infected files") . "</li>" . "<li>"
-      . locale()->maketext("Easy-to-use GUI makes monitoring simple") . "</li>" . "<li>"
-      . locale()->maketext( "[output,url,_1,Learn more about ImunifyAV+,_2,_3]", 'https://go.cpanel.net/buyimunifyAVplus', 'target', '_blank' ) . "</li>" . "</ul>";
+    my $content = {};
 
-    my $install_url  = $self->base_path('scripts13/install_imunifyav_SECURITYADVISOR');
-    my $install_text = locale()->maketext("Install [asis,ImunifyAV] to scan your websites for malware.");
-    my $install_link = locale()->maketext( "[output,url,_1,Install ImunifyAV,_2,_3] for free.", $install_url, 'target', '_blank' );
-    my $text         = $args{upgrade} ? $upgrade_text : $install_text;
-    my $link         = $args{upgrade} ? $upgrade_link : $install_link;
-    my $sugg         = $args{upgrade} ? $upgrade_sugg : "";
+    if ( $args{action} eq 'upgrade' ) {
+        $content = $self->_upgrade_avplus_text();
+    }
+    elsif ( $args{action} eq 'installav' ) {
+        $content = $self->_install_av_text();
+    }
+    elsif ( $args{action} eq 'installplus' ) {
+        $content = $self->_install_avplus_text();
+    }
+    else {
+        return 0;
+    }
 
     my %advice = (
         'key'          => "ImunifyAV+_$args{advice}",
         'block_notify' => 1,
-        'text'         => $text,
-        'suggestion'   => $sugg . $link,
+        'text'         => $content->{text},
+        'suggestion'   => $content->{suggestion} . $content->{link},
     );
 
-    return $args{advice} eq 'error' ? $self->_bad_avplus(%advice) : $self->_warn_avplus(%advice);
+    my $method = "add_$args{advice}_advice";
+    return $self->$method(%advice);
 }
 
 sub _is_imunify_supported {
