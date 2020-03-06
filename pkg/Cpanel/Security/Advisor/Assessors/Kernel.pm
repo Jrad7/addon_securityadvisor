@@ -222,7 +222,7 @@ sub _suggest_kernelcare {
             $promotion .= $self->_lh->maketext(' After you purchase and install KernelCare, you can obtain and install the KernelCare "Extra" Patchset, which includes symlink protection.');
         }
 
-        $self->add_warn_advice(
+        $self->add_info_advice(
             'key'          => 'Kernel_kernelcare_purchase',
             'block_notify' => 1,
             'text'         => $self->_lh->maketext('Use KernelCare to automate kernel security updates without reboots.'),
@@ -495,7 +495,7 @@ sub _suggest_kernelcare_on_a_cpanel_whm_system_at_v64 {
                     'target' => '_parent',
                 );
             }
-            $self->add_warn_advice(
+            $self->add_info_advice(
                 'key'          => 'Kernel_kernelcare_purchase',
                 'block_notify' => 1,
                 'text'         => $self->_lh->maketext('Upgrade to KernelCare.'),

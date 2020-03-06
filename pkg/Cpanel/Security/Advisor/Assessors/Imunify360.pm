@@ -106,14 +106,13 @@ sub generate_advice {
 
 sub _get_purchase_and_install_template {
     return << 'TEMPLATE';
-[%- locale.maketext('[asis,Imunify360] delivers sophisticated detection and display of security threats, powered by a self-learning firewall with herd immunity. It blocks attacks in real-time using a combination of technologies, including:') %]
+[%- locale.maketext('Use [asis,Imunify360] for a comprehensive suite of protection against attacks on your servers.') %]
     <ul>
-        <li>[%- locale.maketext('[asis,Proactive Defense™]') -%]</li>
-        <li>[%- locale.maketext('Smart Intrusion Detection and Protection System')-%]</li>
-        <li>[%- locale.maketext('Malware Detection')-%]</li>
-        [% IF data.include_kernelcare %]
-        <li>[%- locale.maketext('Patch Management via [asis,KernelCare]')-%]</li>
-        [% END %]
+        <li>[%- locale.maketext('Multi-layered defense stops attacks with advanced firewall, herd immunity, Intrusion Prevention System, and more.') -%]</li>
+        <li>[%- locale.maketext('Powered by AI with advanced detection of brute force attacks, zero-day, and unknown security threats.')-%]</li>
+        <li>[%- locale.maketext('[asis,Proactive Defense™] recognizes malicious code in real-time and stops malware in its tracks.') -%]</li>
+        <li>[%- locale.maketext('Easy management right inside your [asis,WHM] interface.')-%]</li>
+        <li>[%- locale.maketext('Patch Management via [asis,KernelCare] and hardened [asis,PHP]')-%]</li>
         <li><a href="https://go.cpanel.net/buyimunify360" target="_new">[%- locale.maketext('Learn more about [asis,Imunify360]')%]</a></li>
     </ul>
 [%- data.link -%]
@@ -214,7 +213,7 @@ sub _suggest_imunify360 {
             },
         );
 
-        $self->add_warn_advice(
+        $self->add_info_advice(
             key          => 'Imunify360_update_license',
             text         => locale()->maketext('[asis,Imunify360] is installed but you do not have a current license.'),
             suggestion   => $$output,
@@ -231,7 +230,7 @@ sub _suggest_imunify360 {
             },
         );
 
-        $self->add_warn_advice(
+        $self->add_info_advice(
             key          => 'Imunify360_purchase',
             text         => locale()->maketext('Use [asis,Imunify360] for complete protection against attacks on your servers.'),
             suggestion   => $$output,
@@ -247,7 +246,7 @@ sub _suggest_imunify360 {
             }
         );
 
-        $self->add_warn_advice(
+        $self->add_info_advice(
             key          => 'Imunify360_install',
             text         => locale()->maketext('You have an [asis,Imunify360] license, but you do not have [asis,Imunify360] installed on your server.'),
             suggestion   => $$output,
@@ -283,13 +282,13 @@ sub _suggest_iav {
 
     if ( !$self->{iav}{installed} && !$self->{iav}{licensed} ) {
         $self->_avplus_advice( action => 'installav', advice => 'bad' );
-        $self->_avplus_advice( action => 'upgrade',   advice => 'warn' );
+        $self->_avplus_advice( action => 'upgrade',   advice => 'info' );
     }
     elsif ( !$self->{iav}{installed} && $self->{iav}{licensed} ) {
         $self->_avplus_advice( action => 'installplus', advice => 'bad' );
     }
     elsif ( $self->{iav}{installed} && !$self->{iav}{licensed} ) {
-        $self->_avplus_advice( action => 'upgrade', advice => 'warn' );
+        $self->_avplus_advice( action => 'upgrade', advice => 'info' );
     }
     elsif ( $self->{iav}{installed} && $self->{iav}{licensed} ) {
         $self->add_good_advice(
@@ -316,13 +315,11 @@ sub _upgrade_avplus_text {
     my ($self) = @_;
     my $purchase_url = $self->base_path('scripts13/purchase_imunifyavplus_init_SECURITYADVISOR');
     return {
-        text       => locale()->maketext("Upgrade to [asis,ImunifyAV+] to scan for malware and clean up infected files with one click."),
+        text       => locale()->maketext("Use [asis,ImunifyAV+] to scan for malware and clean up infected files with one click."),
         link       => locale()->maketext( "[output,url,_1,Get ImunifyAV+,_2,_3] for \$[_4]/month.", $purchase_url, 'target', '_blank', $self->{iav}{price} ),
         suggestion => locale()->maketext("ImunifyAV+ brings you the advanced scanning of ImunifyAV and adds more options to make protecting servers from malicious code almost effortless. Enhanced features include:") . "<ul>" . "<li>"
           . locale()->maketext("Malware and virus scanning") . "</li>" . "<li>"
-          . locale()->maketext("Email notifications if infected files are found") . "</li>" . "<li>"
-          . locale()->maketext("Automatically clean up infected files") . "</li>" . "<li>"
-          . locale()->maketext("Easy-to-use GUI makes monitoring simple") . "</li>" . "<li>"
+          . locale()->maketext("Automatic clean up") . "</li>" . "<li>"
           . locale()->maketext( "[output,url,_1,Learn more about ImunifyAV+,_2,_3]", 'https://go.cpanel.net/buyimunifyAVplus', 'target', '_blank' ) . "</li>" . "</ul>",
     };
 }
