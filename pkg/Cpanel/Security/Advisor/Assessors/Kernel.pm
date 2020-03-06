@@ -133,7 +133,7 @@ sub _suggest_kernelcare {
         $note      = $self->_lh->maketext(q{NOTE: This is not the full KernelCare product and service.});
         my $link = $self->_lh->maketext(
             '[output,url,_1,Add KernelCare\'s Free Symlink Protection,_2,_3].',
-            $self->base_path(_get_script_number() . '/add_kernelcare_free_symlink_protection'),
+            $self->base_path( _get_script_number() . '/add_kernelcare_free_symlink_protection' ),
             'target' => '_parent',
         );
         $self->add_bad_advice(
@@ -180,7 +180,7 @@ sub _suggest_kernelcare {
             'text'       => $self->_lh->maketext('Valid KernelCare License Found, but KernelCare is Not Installed.'),
             'suggestion' => $promotion . ' ' . $self->_lh->maketext(
                 '[output,url,_1,Click to install,_2,_3].',
-                $self->base_path(_get_script_number() . '/purchase_kernelcare_completion?order_status=success'),
+                $self->base_path( _get_script_number() . '/purchase_kernelcare_completion?order_status=success' ),
                 'target' => '_parent',
             ),
         );
@@ -208,14 +208,14 @@ sub _suggest_kernelcare {
             my $price = _get_kernelcare_monthly_price();
             $suggestion = $self->_lh->maketext(
                 '[output,url,_1,Get KernelCare,_2,_3][_4].',
-                $self->base_path(_get_script_number() . '/purchase_kernelcare_init'),
+                $self->base_path( _get_script_number() . '/purchase_kernelcare_init' ),
                 'target' => '_parent',
                 ($price) ? qq{ for \$$price/month} : q{},
             );
         }
 
         $suggestion = ($suggestion) ? '<p/><p/>' . $suggestion : '';
-        $promotion = $self->_lh->maketext('KernelCare provides an easy and effortless way to ensure that your operating system uses the most up-to-date kernel without the need to reboot your server.');
+        $promotion  = $self->_lh->maketext('KernelCare provides an easy and effortless way to ensure that your operating system uses the most up-to-date kernel without the need to reboot your server.');
 
         # Verifies the user is on CentOS 6 or 7, and is not running CloudLinux.
         if ( Cpanel::KernelCare::system_supports_kernelcare_free() ) {
@@ -467,7 +467,7 @@ sub _suggest_kernelcare_on_a_cpanel_whm_system_at_v64 {
                 'text'       => $self->_lh->maketext('Valid KernelCare License Found, but KernelCare is Not Installed.'),
                 'suggestion' => $promotion . ' ' . $self->_lh->maketext(
                     '[output,url,_1,Click to install,_2,_3].',
-                    $self->base_path(_get_script_number() . '/purchase_kernelcare_completion?order_status=success'),
+                    $self->base_path( _get_script_number() . '/purchase_kernelcare_completion?order_status=success' ),
                     'target' => '_parent',
                 ),
             );
@@ -491,7 +491,7 @@ sub _suggest_kernelcare_on_a_cpanel_whm_system_at_v64 {
             else {
                 $suggestion = $self->_lh->maketext(
                     '[output,url,_1,Upgrade to KernelCare,_2,_3].',
-                    $self->base_path(_get_script_number() . '/purchase_kernelcare_init'),
+                    $self->base_path( _get_script_number() . '/purchase_kernelcare_init' ),
                     'target' => '_parent',
                 );
             }
@@ -534,7 +534,7 @@ sub _get_kernelcare_monthly_price {
 
 sub _verify_kernelcare_license {
     my $mainserverip = Cpanel::NAT::get_public_ip( Cpanel::DIp::MainIP::getmainserverip() );
-    my $verify_url = sprintf( "%s/ipaddrs.cgi?ip=%s", $KC_VERIFY_URL, $mainserverip );
+    my $verify_url   = sprintf( "%s/ipaddrs.cgi?ip=%s", $KC_VERIFY_URL, $mainserverip );
     my $verified;
     local $@;
     my $response = eval {
@@ -715,7 +715,7 @@ sub kcare_kernel_version {
     my $kc_response = "";
 
     if ( -f "/usr/bin/kcarectl" ) {
-        @args = ( "/usr/bin/kcarectl", "--" . "$_[0]" );
+        @args        = ( "/usr/bin/kcarectl", "--" . "$_[0]" );
         $kc_response = Cpanel::SafeRun::Errors::saferunnoerror(@args);
         $kc_response =~ s/\+$//;
         chomp $kc_response;
